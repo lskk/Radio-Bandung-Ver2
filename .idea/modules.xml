@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Radio-Streaming-Bandung-4796a92c5c952bbf0ddf18d91b1a25e5a158f0ff.iml" filepath="$PROJECT_DIR$/Radio-Streaming-Bandung-4796a92c5c952bbf0ddf18d91b1a25e5a158f0ff.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio/vitamio.iml" filepath="$PROJECT_DIR$/vitamio/vitamio.iml" />
+    </modules>
+  </component>
+</project>

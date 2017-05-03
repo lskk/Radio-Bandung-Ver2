@@ -1,0 +1,134 @@
+@Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final Acara acara = acaraArrayList.get(position);
+        Log.i(TAG, "Size : " + acaraArrayList.size() + " " + position + " " + acara.getNama());
+        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_acara, parent, false);
+        final MyViewHolder holder = new MyViewHolder(convertView);
+        holder.name.setText(acara.getNama());
+        holder.tanggal.setText(acara.getTanggal());
+        holder.waktu.setText(acara.getWaktu());
+
+        /*
+        acara.setPlayer(new MediaPlayer());
+        try {
+            acara.getPlayer().setDataSource(acara.getRadio_url());
+        } catch (IOException e) {
+            Log.e(TAG, "Preparing " + acara.getRadio_url());
+        }
+        */
+
+        /*
+        acara.getPlayer().setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(final MediaPlayer mediaPlayer) {
+                //Mengubah fungsi tombol play saat data streaming telah tersedia
+                holder.play.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mediaPlayer.isPlaying()) {
+                            mediaPlayer.pause();
+                            holder.playIconOn();
+                        } else {
+                            if (!holder.isStream) {
+                                try {
+                                    acara.getPlayer().prepare();
+                                    holder.isStream = true;
+                                    holder.playIconOn();
+                                    Log.i(TAG, "Preparing on play");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                mediaPlayer.start();
+                                holder.pauseIconOn();
+                            }
+                            isAnyPlay[position] = true;
+                        }
+                    }
+                });
+                holder.stop.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mediaPlayer.reset();
+                        try {
+                            mediaPlayer.setDataSource(acara.getRadio_url());
+                            holder.isStream = false;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        holder.syncIconOn();
+                        isAnyPlay[position] = false;
+                    }
+                });
+            }
+        });
+        */
+
+        //Saat button play click pertama
+        holder.play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if (acara.getPlayer()==null){
+                        acara.setPlayer(new MediaPlayer());
+                        acara.getPlayer().reset();
+                        acara.getPlayer().setDataSource(acara.getRadio_url());
+                        acara.getPlayer().setAudioStreamType(AudioManager.STREAM_MUSIC);
+                        acara.getPlayer().prepare();
+                        holder.playIconOn();
+                    }else{
+                        if (acara.getPlayer().isPlaying()){
+                            acara.getPlayer().pause();
+                            holder.playIconOn();
+                        }else{
+                            acara.getPlayer().start();
+                            holder.pauseIconOn();
+                        }
+                    }
+                    /*
+                    acara.getPlayer().setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    acara.getPlayer().prepare();
+                    holder.isStream = true;
+                    isAnyPlay[position] = true;
+                    holder.playIconOn();
+                    Log.i(TAG, "Preparing on play");
+                    */
+                } catch (IOException e) {
+                    Log.e(TAG, "Preparing " + acara.getRadio_url());
+                }
+            }
+        });
+
+        holder.stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                acara.getPlayer().stop();
+                acara.getPlayer().release();
+                acara.setPlayer(null);
+                holder.syncIconOn();
+            }
+        });
+
+        holder.download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.download_prog.setVisibility(View.VISIBLE);
+                if (acara.getDownloader() != null && acara.getDownloader().getStatus() != AsyncTask.Status.FINISHED) {
+                    Log.i(TAG, "Download canceled now..");
+                    acara.getDownloader().cancel(true);
+                    Toast.makeText(context, "Download " + acara.getNama() + " dibatalkan!", Toast.LENGTH_SHORT).show();
+                    holder.download.setImageResource(R.drawable.ic_action_download);
+                    holder.download_prog.setProgress(0);
+                } else {
+                    acara.setDownloader(new DownloadRadioTask(acara, holder.download_prog, holder.download));
+                    acara.getDownloader().execute(acara.getDownload_url());
+                    Log.i(TAG, "Download starting now..");
+                    holder.download.setImageResource(R.drawable.ic_action_cancel);
+                    holder.firstDownload_click = false;
+                    Toast.makeText(context, "Download " + acara.getNama() + "!", Toast.LENGTH_SHORT).show();
+                }
+                isAnyDownload[position] = !acara.getDownloader().isCancelled();
+            }
+        });
+        return convertView;
+    }
